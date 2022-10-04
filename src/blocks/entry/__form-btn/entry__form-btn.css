@@ -1,0 +1,18 @@
+.entry__form-btn {
+  margin-top: 186px;
+  display: block;
+  width: 100%;
+  background: #fff;
+  padding: 14px 0;
+  cursor: pointer;
+  border-radius: 2px;
+  border: none;
+  transition: opacity 0.3s ease;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.entry__form-btn:hover {
+  opacity: 0.85;
+}

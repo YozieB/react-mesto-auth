@@ -1,0 +1,26 @@
+.entry__input {
+  box-sizing: border-box;
+  color: #fff;
+  background: #000;
+  border: none;
+  height: 27px;
+  padding-bottom: 13px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  width: 100%;
+  border-bottom: 2px solid #ccc;
+  transition: border-color .3s ease;
+}
+
+.entry__input::placeholder {
+  color: #ccc;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.entry__input:focus {
+  outline: none;
+  border-color: #fff;
+}
