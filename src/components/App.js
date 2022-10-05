@@ -4,14 +4,15 @@ import Header from './Header'
 import ImagePopup from './ImagePopup'
 import Main from './Main'
 import PopupWithForm from './PopupWithForm'
-import { api } from '../utils/api'
+import { api, entryApi } from '../utils/api'
 import { CurrentUserContext } from '../context/CurrentUserContext'
 import EditProfilePopup from './EditProfilePopup'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import EditAvatarPopup from './EditAvatarPopup'
 import AddPlacePopup from './AddPlacePopup'
 import Login from './Login'
 import Register from './Register'
+import ProtectedRoute from './ProtectedRoute'
 
 function App() {
   document.body.classList.add('page')
@@ -28,6 +29,7 @@ function App() {
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
     selectedCard
+  const navigate = useNavigate()
 
   useEffect(() => {
     setIsLoading(true)
@@ -145,29 +147,57 @@ function App() {
       })
       .catch(error => console.log(`Error: ${error}`))
   }
+
+  useEffect(() => {
+    if (localStorage.token) {
+      const jwt = localStorage.getItem('token')
+      if (jwt) {
+        entryApi.checkUserToken(jwt).then(res => {
+          if (res) {
+            setIsLogged(true)
+            navigate('/')
+          }
+        })
+      }
+    }
+  }, [navigate])
+
+  function handleLoginUser(password, email) {
+    entryApi
+      .signUser(password, email)
+      .then(res => {
+        localStorage.setItem('token', res.token)
+        setIsLogged(true)
+        navigate('/')
+      })
+      .catch(error => console.log(`Error: ${error}`))
+  }
+  function handleExit() {
+    localStorage.removeItem('jwt')
+    navigate('/sign-in')
+    setIsLogged(false)
+  }
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <Header />
       <Routes>
         <Route path='/sign-up' element={<Register />} />
-        <Route path='/sign-in' element={<Login buttonText='Войти' />} />
+        <Route path='/sign-in' element={<Login onLogin={handleLoginUser} />} />
         <Route
           path='/'
           element={
-            isLogged ? (
-              <Main
-                onEditProfile={handleEditProfileClick}
-                onAddPlace={handleAddPlaceClick}
-                onEditAvatar={handleEditAvatarClick}
-                onCardClick={handleCardClick}
-                onCardLike={handleCardLike}
-                cards={cards}
-                onCardDelete={handleCardDelete}
-                onLoad={isLoading}
-              />
-            ) : (
-              <Navigate to='/sign-in' />
-            )
+            <ProtectedRoute
+              isLogged={isLogged}
+              component={Main}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              cards={cards}
+              onCardDelete={handleCardDelete}
+              onLoad={isLoading}
+            />
           }
         />
       </Routes>
