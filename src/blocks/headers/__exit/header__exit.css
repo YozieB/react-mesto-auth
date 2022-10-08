@@ -1,0 +1,15 @@
+.header__exit {
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  color: #A9A9A9;
+  transition: color .3s ease;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.header__exit:hover {
+  color: rgb(215, 215, 215);
+}

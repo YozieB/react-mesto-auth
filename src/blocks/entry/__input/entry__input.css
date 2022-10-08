@@ -10,7 +10,8 @@
   line-height: 17px;
   width: 100%;
   border-bottom: 2px solid #ccc;
-  transition: border-color .3s ease;
+  transition: border-color 0.3s ease;
+  overflow: visible;
 }
 
 .entry__input::placeholder {
@@ -23,4 +24,23 @@
 .entry__input:focus {
   outline: none;
   border-color: #fff;
+}
+
+.entry__input:focus::placeholder {
+  color: red;
+  transform: translate(-10px, -10px)
+}
+
+.entry__input:focus + .entry__placeholder, .entry__input:not(:placeholder-shown) + .entry__placeholder {
+  transform: scale(0.75) translateY(-130%) translateX(-5px);
+}
+.entry__input:-webkit-autofill,
+.entry__input:-webkit-autofill:hover, 
+.entry__input:-webkit-autofill:focus, 
+.entry__input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px black inset;
+}
+
+.entry__input:-webkit-autofill{
+    -webkit-text-fill-color: white;
 }

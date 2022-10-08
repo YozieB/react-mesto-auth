@@ -1,16 +1,27 @@
 import logo from '../images/logo.svg'
-export default function Header() {
+import { Link } from 'react-router-dom'
+export default function Header({
+  isLogged,
+  buttonText,
+  buttonPath,
+  onExitButtonClick,
+  userEmail,
+}) {
   return (
     <header className='container header'>
-      <a
-        onClick={() => {
-          localStorage.removeItem('token')
-          console.log(localStorage)
-        }}
-      >
-        zalupa
-      </a>
       <img src={logo} className='image header__image' alt='Место' />
+      {!isLogged ? (
+        <Link className='header__link' to={buttonPath}>
+          {buttonText}
+        </Link>
+      ) : (
+        <div className='header__info'>
+          <p className='header__email'>{userEmail}</p>
+          <button className='header__exit' onClick={onExitButtonClick}>
+            Выйти
+          </button>
+        </div>
+      )}
     </header>
   )
 }

@@ -1,34 +1,43 @@
 import { useEffect, useState } from 'react'
 import Footer from './Footer'
-import Header from './Header'
 import ImagePopup from './ImagePopup'
 import Main from './Main'
 import PopupWithForm from './PopupWithForm'
 import { api, entryApi } from '../utils/api'
 import { CurrentUserContext } from '../context/CurrentUserContext'
 import EditProfilePopup from './EditProfilePopup'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import EditAvatarPopup from './EditAvatarPopup'
 import AddPlacePopup from './AddPlacePopup'
 import Login from './Login'
 import Register from './Register'
 import ProtectedRoute from './ProtectedRoute'
+import InfoTooltip from './InfoTooltip'
+import authTrue from '../images/authtrue.svg'
+import authFalse from '../images/authfalse.svg'
 
 function App() {
   document.body.classList.add('page')
+  const [dataInfoTooltip, setDataInfoTooltip] = useState({
+    title: '',
+    imgPath: '',
+  })
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false)
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false)
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false)
+  const [isInfoTooltipOpen, setInfoTooltipOpen] = useState(false)
   const [selectedCard, setSelectedCard] = useState(null)
   const [currentUser, setCurrentUser] = useState({})
   const [cards, setInitialCards] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLogged, setIsLogged] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const isOpen =
     isEditAvatarPopupOpen ||
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
-    selectedCard
+    selectedCard ||
+    isInfoTooltipOpen
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -85,6 +94,13 @@ function App() {
     setEditProfilePopupOpen(false)
     setAddPlacePopupOpen(false)
     setSelectedCard(null)
+    setInfoTooltipOpen(false)
+    setTimeout(() => {
+      setDataInfoTooltip({
+        title: '',
+        imgPath: '',
+      })
+    }, 300)
   }
   function handleCardClick(card) {
     setSelectedCard(card)
@@ -152,17 +168,27 @@ function App() {
     if (localStorage.token) {
       const jwt = localStorage.getItem('token')
       if (jwt) {
-        entryApi.checkUserToken(jwt).then(res => {
-          if (res) {
-            setIsLogged(true)
-            navigate('/')
-          }
-        })
+        entryApi
+          .checkUserToken(jwt)
+          .then(res => {
+            if (res) {
+              setUserEmail(res.data.email)
+              setIsLogged(true)
+              navigate('/')
+            }
+          })
+          .catch(error => console.log(`Error: ${error}`))
       }
     }
   }, [navigate])
+  function handleExit() {
+    localStorage.removeItem('token')
+    navigate('/sign-in')
+    setIsLogged(false)
+  }
 
   function handleLoginUser(password, email) {
+    setIsLoading(true)
     entryApi
       .signUser(password, email)
       .then(res => {
@@ -170,19 +196,71 @@ function App() {
         setIsLogged(true)
         navigate('/')
       })
-      .catch(error => console.log(`Error: ${error}`))
+      .finally(() => {
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setInfoTooltipOpen(true)
+        setDataInfoTooltip({
+          title: 'Что-то пошло не так! Попробуйте ещё раз.',
+          imgPath: authFalse,
+        })
+      })
   }
-  function handleExit() {
-    localStorage.removeItem('jwt')
-    navigate('/sign-in')
-    setIsLogged(false)
+  function handleRegisterSubmit(password, email) {
+    setIsLoading(true)
+    entryApi
+      .registerUser(password, email)
+      .then(res => {
+        navigate('/sign-in')
+        setInfoTooltipOpen(true)
+        setDataInfoTooltip({
+          title: 'Вы успешно зарегистрировались',
+          imgPath: authTrue,
+        })
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setInfoTooltipOpen(true)
+        setDataInfoTooltip({
+          title: 'Что-то пошло не так! Попробуйте ещё раз.',
+          imgPath: authFalse,
+        })
+      })
   }
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <Header />
       <Routes>
-        <Route path='/sign-up' element={<Register />} />
-        <Route path='/sign-in' element={<Login onLogin={handleLoginUser} />} />
+        <Route
+          path='/sign-up'
+          element={
+            isLoading ? (
+              <div className='container entry'>
+                <div className='loader'></div>
+              </div>
+            ) : (
+              <Register
+                isLogged={isLogged}
+                isOpen={isOpen}
+                onSubmit={handleRegisterSubmit}
+              />
+            )
+          }
+        />
+        <Route
+          path='/sign-in'
+          element={
+            isLoading ? (
+              <div className='container entry'>
+                <div className='loader'></div>
+              </div>
+            ) : (
+              <Login onLogin={handleLoginUser} isLogged={isLogged} />
+            )
+          }
+        />
         <Route
           path='/'
           element={
@@ -197,6 +275,8 @@ function App() {
               cards={cards}
               onCardDelete={handleCardDelete}
               onLoad={isLoading}
+              onExitButtonClick={handleExit}
+              userEmail={userEmail}
             />
           }
         />
@@ -227,6 +307,12 @@ function App() {
         buttonText={isLoading ? 'Удаление...' : 'Удалить'}
       />
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <InfoTooltip
+        onClose={closeAllPopups}
+        title={dataInfoTooltip.title}
+        imgPath={dataInfoTooltip.imgPath}
+        isOpen={isOpen}
+      />
     </CurrentUserContext.Provider>
   )
 }

@@ -48,3 +48,11 @@
 @import url(./blocks/entry/__form-btn/entry__form-btn.css);
 @import url(./blocks/entry/__input/entry__input.css);
 @import url(./blocks/entry/__check/entry__check.css);
+@import url(./blocks/header/__link/header__link.css);
+@import url(./blocks/headers/__info/header__info.css);
+@import url(./blocks/headers/__exit/header__exit.css);
+@import url(./blocks/headers/__email/header__email.css);
+@import url(./blocks/entry/__placeholder/entry__placeholder.css);
+@import url(./blocks/info-tooltip/info-tooltiip.css);
+@import url(./blocks/info-tooltip/__image/info-tooltip__image.css);
+@import url(./blocks/info-tooltip/__title/info-tooltip__title.css);

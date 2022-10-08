@@ -1,8 +1,8 @@
-import { entryApi } from '../utils/api'
 import EntryComponent from './EntryComponent'
 import { useState } from 'react'
+import Header from './Header'
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, isLogged }) {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   function handleChangePassword(e) {
@@ -11,18 +11,24 @@ export default function Login({ onLogin }) {
   function handleChangeEmail(e) {
     setEmail(e.target.value)
   }
-  function handleSubmit(e) {
-    e.preventDefault()
+  function handleSubmit() {
     onLogin(password, email)
   }
   return (
-    <EntryComponent
-      buttonText='Войти'
-      title='Вход'
-      onChangeEmail={handleChangeEmail}
-      onChangePassword={handleChangePassword}
-      onSubmit={handleSubmit}
-      inputValue={''}
-    />
+    <>
+      <Header
+        isLogged={isLogged}
+        buttonText='Регистрация'
+        buttonPath='/sign-up'
+      />
+      <EntryComponent
+        buttonText='Войти'
+        title='Вход'
+        onChangeEmail={handleChangeEmail}
+        onChangePassword={handleChangePassword}
+        onSubmit={handleSubmit}
+        inputValue={''}
+      />
+    </>
   )
 }
