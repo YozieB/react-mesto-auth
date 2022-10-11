@@ -17,6 +17,15 @@ export default function Main({
   userEmail,
 }) {
   const currentUser = useContext(CurrentUserContext)
+  const cardElements = cards.map(card => (
+    <Card
+      key={card._id}
+      card={card}
+      onCardClick={onCardClick}
+      onCardLike={onCardLike}
+      onCardDelete={onCardDelete}
+    />
+  ))
   return (
     <>
       <Header
@@ -58,17 +67,7 @@ export default function Main({
             onClick={onAddPlace}
           ></button>
         </section>
-        <section className='container gallery'>
-          {cards.map(card => (
-            <Card
-              key={card._id}
-              card={card}
-              onCardClick={onCardClick}
-              onCardLike={onCardLike}
-              onCardDelete={onCardDelete}
-            />
-          ))}
-        </section>
+        <section className='container gallery'>{cardElements}</section>
       </main>
     </>
   )

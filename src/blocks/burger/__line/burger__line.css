@@ -1,0 +1,11 @@
+.burger__line {
+  display: block;
+  width: 24px;
+  height: 3px;
+  background-color: #fff;
+  transition: transform .3s ease;
+}
+
+.burger__line:nth-child(2) {
+  margin: 6px 0;
+}

@@ -3,10 +3,11 @@ import Footer from './Footer'
 import ImagePopup from './ImagePopup'
 import Main from './Main'
 import PopupWithForm from './PopupWithForm'
-import { api, entryApi } from '../utils/api'
+import { api } from '../utils/Api'
+import { entryApi } from '../utils/Auth'
 import { CurrentUserContext } from '../context/CurrentUserContext'
 import EditProfilePopup from './EditProfilePopup'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import EditAvatarPopup from './EditAvatarPopup'
 import AddPlacePopup from './AddPlacePopup'
 import Login from './Login'
@@ -15,9 +16,9 @@ import ProtectedRoute from './ProtectedRoute'
 import InfoTooltip from './InfoTooltip'
 import authTrue from '../images/authtrue.svg'
 import authFalse from '../images/authfalse.svg'
+import Loader from './Loader'
 
 function App() {
-  document.body.classList.add('page')
   const [dataInfoTooltip, setDataInfoTooltip] = useState({
     title: '',
     imgPath: '',
@@ -32,7 +33,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLogged, setIsLogged] = useState(false)
   const [userEmail, setUserEmail] = useState('')
-  const isOpen =
+  const isAnyPopupOpened =
     isEditAvatarPopupOpen ||
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
@@ -41,25 +42,19 @@ function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    setIsLoading(true)
-    api
-      .getUserInfo()
-      .then(user => {
-        setCurrentUser(user)
-      })
-      .catch(error => console.log(`Error: ${error}`))
-      .finally(() => {
-        setIsLoading(false)
-      })
-
-    api
-      .getInitialCards()
-      .then(card => {
-        setInitialCards(card)
-      })
-      .catch(error => console.log(`Error: ${error}`))
-  }, [])
-  useEffect(() => {
+    if (isLogged) {
+      setIsLoading(true)
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([user, cards]) => {
+          setCurrentUser(user)
+          setInitialCards(cards)
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    }
+  }, [isLogged])
+  /*   useEffect(() => {
     function closeByEscape(evt) {
       if (evt.key === 'Escape') {
         closeAllPopups()
@@ -70,7 +65,7 @@ function App() {
         closeAllPopups()
       }
     }
-    if (isOpen) {
+    if (isAnyPopupOpened) {
       document.addEventListener('keydown', closeByEscape)
       document.addEventListener('mousedown', closeByClickOutside)
       return () => {
@@ -78,7 +73,7 @@ function App() {
         document.removeEventListener('mousedown', closeByClickOutside)
       }
     }
-  }, [isOpen])
+  }, [isAnyPopupOpened]) */
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true)
@@ -165,20 +160,18 @@ function App() {
   }
 
   useEffect(() => {
-    if (localStorage.token) {
-      const jwt = localStorage.getItem('token')
-      if (jwt) {
-        entryApi
-          .checkUserToken(jwt)
-          .then(res => {
-            if (res) {
-              setUserEmail(res.data.email)
-              setIsLogged(true)
-              navigate('/')
-            }
-          })
-          .catch(error => console.log(`Error: ${error}`))
-      }
+    const token = localStorage.getItem('token')
+    if (token) {
+      entryApi
+        .checkUserToken(token)
+        .then(res => {
+          if (res) {
+            setUserEmail(res.data.email)
+            setIsLogged(true)
+            navigate('/')
+          }
+        })
+        .catch(error => console.log(`Error: ${error}`))
     }
   }, [navigate])
   function handleExit() {
@@ -211,9 +204,8 @@ function App() {
     setIsLoading(true)
     entryApi
       .registerUser(password, email)
-      .then(res => {
+      .then(() => {
         navigate('/sign-in')
-        setInfoTooltipOpen(true)
         setDataInfoTooltip({
           title: 'Вы успешно зарегистрировались',
           imgPath: authTrue,
@@ -221,9 +213,9 @@ function App() {
       })
       .finally(() => {
         setIsLoading(false)
+        setInfoTooltipOpen(true)
       })
       .catch(() => {
-        setInfoTooltipOpen(true)
         setDataInfoTooltip({
           title: 'Что-то пошло не так! Попробуйте ещё раз.',
           imgPath: authFalse,
@@ -237,13 +229,11 @@ function App() {
           path='/sign-up'
           element={
             isLoading ? (
-              <div className='container entry'>
-                <div className='loader'></div>
-              </div>
+              <Loader />
             ) : (
               <Register
                 isLogged={isLogged}
-                isOpen={isOpen}
+                isOpen={isAnyPopupOpened}
                 onSubmit={handleRegisterSubmit}
               />
             )
@@ -253,9 +243,7 @@ function App() {
           path='/sign-in'
           element={
             isLoading ? (
-              <div className='container entry'>
-                <div className='loader'></div>
-              </div>
+              <Loader />
             ) : (
               <Login onLogin={handleLoginUser} isLogged={isLogged} />
             )
@@ -280,38 +268,52 @@ function App() {
             />
           }
         />
+        <Route
+          path='*'
+          element={
+            isLogged ? (
+              <Navigate to='/' replace />
+            ) : (
+              <Navigate to='/sign-in' replace />
+            )
+          }
+        />
       </Routes>
       {isLogged && <Footer />}
       <EditProfilePopup
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
         onUpdateUser={handleUpdateUser}
-        buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
+        buttonText={/* isLoading ? 'Сохранение...' : */ 'Сохранить'}
       />
       <AddPlacePopup
         isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
         onAddCardPlace={handleAddPlaceSubmit}
-        buttonText={isLoading ? 'Создание...' : 'Создать'}
+        buttonText={/* isLoading ? 'Создание...' : */ 'Создать'}
       />
       <EditAvatarPopup
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
         onUpdateAvatar={handleUpdateAvatar}
-        buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
+        buttonText={/* isLoading ? 'Сохранение...' : */ 'Сохранить'}
       />
       <PopupWithForm
         name='remove-popup'
         form='#'
         title='Вы уверены?'
-        buttonText={isLoading ? 'Удаление...' : 'Удалить'}
+        buttonText={/* isLoading ? 'Удаление...' : */ 'Удалить'}
       />
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <ImagePopup
+        isOpen={selectedCard}
+        card={selectedCard}
+        onClose={closeAllPopups}
+      />
       <InfoTooltip
         onClose={closeAllPopups}
         title={dataInfoTooltip.title}
         imgPath={dataInfoTooltip.imgPath}
-        isOpen={isOpen}
+        isOpen={isInfoTooltipOpen}
       />
     </CurrentUserContext.Provider>
   )

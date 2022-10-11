@@ -2,7 +2,7 @@ import { CurrentUserContext } from '../context/CurrentUserContext'
 import { useContext } from 'react'
 export default function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   const currentUser = useContext(CurrentUserContext)
-  function handleClick() {
+  function handleImageClick() {
     onCardClick(card)
   }
   function handleLikeClick() {
@@ -22,7 +22,7 @@ export default function Card({ card, onCardClick, onCardLike, onCardDelete }) {
         className='image card__image'
         src={card.link}
         alt={card.name}
-        onClick={handleClick}
+        onClick={handleImageClick}
       />
       <div className='card__info'>
         <h2 className='card__title'>{card.name}</h2>

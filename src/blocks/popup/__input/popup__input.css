@@ -18,7 +18,3 @@
 /* .popup__input:not(.popup__input:last-child) {
     margin-bottom: 30px;
 } */
-
-.popup__input:last-child {
-    margin-bottom: 48px;
-}

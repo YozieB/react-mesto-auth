@@ -1,6 +1,27 @@
 import React from 'react'
+import { useEffect } from 'react'
 
 export default function InfoTooltip({ isOpen, onClose, title, imgPath }) {
+  useEffect(() => {
+    function closeByEscape(evt) {
+      if (evt.key === 'Escape') {
+        onClose()
+      }
+    }
+    function closeByClickOutside(evt) {
+      if (evt.target.classList.contains('popup_opened')) {
+        onClose()
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('keydown', closeByEscape)
+      document.addEventListener('mousedown', closeByClickOutside)
+      return () => {
+        document.removeEventListener('keydown', closeByEscape)
+        document.removeEventListener('mousedown', closeByClickOutside)
+      }
+    }
+  }, [isOpen])
   return (
     <div className={`popup info-popup ${isOpen ? 'popup_opened' : ''}`}>
       <div className='popup__container'>

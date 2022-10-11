@@ -1,4 +1,25 @@
-export default function ImagePopup({ card, onClose }) {
+import { useEffect } from 'react'
+export default function ImagePopup({ card, onClose, isOpen }) {
+  useEffect(() => {
+    function closeByEscape(evt) {
+      if (evt.key === 'Escape') {
+        onClose()
+      }
+    }
+    function closeByClickOutside(evt) {
+      if (evt.target.classList.contains('popup_opened')) {
+        onClose()
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('keydown', closeByEscape)
+      document.addEventListener('mousedown', closeByClickOutside)
+      return () => {
+        document.removeEventListener('keydown', closeByEscape)
+        document.removeEventListener('mousedown', closeByClickOutside)
+      }
+    }
+  }, [isOpen])
   return (
     <div className={`popup image-popup ${card !== null ? 'popup_opened' : ''}`}>
       <div className='popup__container popup__container_image'>

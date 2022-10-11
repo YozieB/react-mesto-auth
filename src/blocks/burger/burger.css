@@ -1,0 +1,22 @@
+.burger {
+  display: none;
+}
+
+.burger_active > .burger__line:nth-child(2) {
+ opacity: 0;
+}
+.burger_active > .burger__line:nth-child(1) {
+ transform: translateY(8px) rotate(-45deg) ;
+}
+.burger_active > .burger__line:nth-child(3) {
+ transform: translateY(-10px) rotate(45deg) ;
+}
+
+
+@media (max-width: 650px) {
+  .burger {
+    display: block;
+    width: 24px;
+    height: 18px;
+  }
+}

@@ -48,7 +48,6 @@ export default function AddPlacePopup({
           value={cardName || ''}
           onChange={handleChangeCardName}
         />
-        <span className='popup__input-place-error popup__error'></span>
       </label>
       <label htmlFor='#' className='popup__form-field'>
         <input
@@ -61,7 +60,6 @@ export default function AddPlacePopup({
           value={cardLink || ''}
           onChange={handleChangeCardLink}
         />
-        <span className='popup__input-link-error popup__error'></span>
       </label>
     </PopupWithForm>
   )

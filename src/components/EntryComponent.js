@@ -8,6 +8,10 @@ export default function EntryComponent({
   email,
   password,
 }) {
+  function handleSubmitForm(e) {
+    e.preventDefault()
+    onSubmit()
+  }
   return (
     <>
       <div className='container entry'>
@@ -16,10 +20,7 @@ export default function EntryComponent({
           action='#'
           name='login'
           className='entry__form'
-          onSubmit={e => {
-            e.preventDefault()
-            onSubmit()
-          }}
+          onSubmit={handleSubmitForm}
         >
           <label htmlFor='#' className='entry__form-field'>
             <input
@@ -29,7 +30,6 @@ export default function EntryComponent({
               name='email'
               placeholder=' '
               minLength='2'
-              maxLength='30'
               required
               onChange={onChangeEmail}
               value={'' || email}
