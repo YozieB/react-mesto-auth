@@ -54,27 +54,6 @@ function App() {
         })
     }
   }, [isLogged])
-  /*   useEffect(() => {
-    function closeByEscape(evt) {
-      if (evt.key === 'Escape') {
-        closeAllPopups()
-      }
-    }
-    function closeByClickOutside(evt) {
-      if (evt.target.classList.contains('popup_opened')) {
-        closeAllPopups()
-      }
-    }
-    if (isAnyPopupOpened) {
-      document.addEventListener('keydown', closeByEscape)
-      document.addEventListener('mousedown', closeByClickOutside)
-      return () => {
-        document.removeEventListener('keydown', closeByEscape)
-        document.removeEventListener('mousedown', closeByClickOutside)
-      }
-    }
-  }, [isAnyPopupOpened]) */
-
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true)
   }
