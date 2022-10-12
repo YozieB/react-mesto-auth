@@ -9,17 +9,6 @@ export default function Header({
   userEmail,
 }) {
   const [isBurgerActive, setIsBurgerActive] = useState(false)
-  function handleResize() {
-    if (window.screen.width >= 650) {
-      setIsBurgerActive(false)
-    }
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
   return (
     <>
       <div
