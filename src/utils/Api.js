@@ -86,13 +86,11 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://nomoreparties.co/v1/cohort-47',
+  baseUrl: 'https://api.yozieb.nomoredomains.club',
   headers: {
-    authorization: '58e0c3d0-e6a7-4bbe-b2ed-1f041ed89baf',
+    authorization: `Bearer ${localStorage.getItem('token')}`,
     'Content-Type': 'application/json',
   },
 })
-
-console.log('s')
 
 export { api }

@@ -11,8 +11,8 @@ export default function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   function handleRemoveClick() {
     onCardDelete(card)
   }
-  const isOwn = currentUser._id === card.owner._id
-  const isLiked = card.likes.some(i => i._id === currentUser._id)
+  const isOwn = (card.owner || card.owner._id) === currentUser._id
+  const isLiked = card.likes.some(i => (i._id || i) === currentUser._id)
   return (
     <div className='card'>
       {isOwn && (

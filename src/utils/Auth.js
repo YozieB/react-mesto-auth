@@ -45,9 +45,10 @@ class Auth {
 }
 
 const entryApi = new Auth({
-  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: 'https://api.yozieb.nomoredomains.club',
   headers: {
     'Content-Type': 'application/json',
+    /*"Authorization" : `Bearer ${token}`*/
   },
 })
 

@@ -47,7 +47,7 @@ function App() {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
         .then(([user, cards]) => {
           setCurrentUser(user)
-          setInitialCards(cards)
+          setInitialCards(cards.reverse())
         })
         .finally(() => {
           setIsLoading(false)
@@ -84,7 +84,7 @@ function App() {
     api
       .setUserInfo(user.name, user.about)
       .then(result => {
-        setCurrentUser(result)
+        setCurrentUser(result.user)
         closeAllPopups()
       })
       .catch(error => console.log(`Error: ${error}`))
@@ -97,7 +97,7 @@ function App() {
     api
       .updateAvatar(avatar.avatar)
       .then(result => {
-        setCurrentUser(result)
+        setCurrentUser(result.user)
         closeAllPopups()
       })
       .finally(() => {
@@ -107,14 +107,11 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id)
-
+    const isLiked = card.likes.some(i => (i._id || i) === currentUser._id)
     api
       .changeLikeCardStatus(card._id, !isLiked)
       .then(newCard => {
-        setInitialCards(state =>
-          state.map(c => (c._id === card._id ? newCard : c))
-        )
+        setInitialCards((state) => state.map(c => (c._id === card._id ? newCard.card : c)))
       })
       .catch(error => console.log(`Error: ${error}`))
   }
@@ -132,7 +129,7 @@ function App() {
     api
       .addCard(card.name, card.link)
       .then(card => {
-        setInitialCards([card, ...cards])
+        setInitialCards([card.card, ...cards])
         closeAllPopups()
       })
       .catch(error => console.log(`Error: ${error}`))
@@ -145,7 +142,8 @@ function App() {
         .checkUserToken(token)
         .then(res => {
           if (res) {
-            setUserEmail(res.data.email)
+            setUserEmail(res.email)
+            setCurrentUser(res)
             setIsLogged(true)
             navigate('/')
           }
